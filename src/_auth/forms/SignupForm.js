@@ -1,13 +1,39 @@
-import React from "react";
-import Button from "../../components/Button";
+import { React, useState } from "react";
+import { Navigate, Link } from "react-router-dom";
+// import Button from "../../components/Button";
+// import LoadingBtn from "../../components/LoadingBtn";
+// import { account, ID } from "./lib/appwrite";
+import { account, ID } from "../../lib/appwrite";
 import LoadingBtn from "../../components/LoadingBtn";
-import { Link } from "react-router-dom";
 import("preline");
 
-const SignupForm = () => {
-  const isClicked = false;
+function SignupForm() {
+  const [onSubmit, setOnSubmit] = useState(true);
+  const [loggedInUser, setLoggedInUser] = useState(null);
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [name, setName] = useState("");
+  const [username, setUsername] = useState("");
+
+  const createUser = async () => {
+    try {
+      setOnSubmit(false);
+      await account.create(ID.unique(), email, password, name, username);
+      login(email, password);
+    } catch (error) {
+      setOnSubmit(true);
+      alert(error);
+    }
+  };
+
+  async function login(email, password) {
+    await account.createEmailSession(email, password);
+    setLoggedInUser(await account.get());
+  }
   return (
     <div className="  space-y-4  xl:w-420 xl:ml-44  flex-1  ">
+      {loggedInUser ? <Navigate to={"/"} /> : "Not logged in"}
+
       <div className=" text-center">
         <img
           src=" /assets/images/logo.svg"
@@ -31,10 +57,11 @@ const SignupForm = () => {
           Name
         </label>
         <input
+          value={name}
+          onChange={(e) => setName(e.target.value)}
           type="email"
           id="input-label"
           class="py-3 px-4 block w-full border-gray-200 rounded-lg text-sm focus:border-blue-500 focus:ring-blue-500 disabled:opacity-50 disabled:pointer-events-none dark:bg-slate-900 dark:border-gray-700 dark:text-gray-400 dark:focus:ring-gray-600"
-          placeholder="you@site.com"
         ></input>
       </div>
 
@@ -46,10 +73,11 @@ const SignupForm = () => {
           Username
         </label>
         <input
+          value={username}
+          onChange={(e) => setUsername(e.target.value)}
           type="email"
           id="input-label"
           class="py-3 px-4 block w-full border-gray-200 rounded-lg text-sm focus:border-blue-500 focus:ring-blue-500 disabled:opacity-50 disabled:pointer-events-none dark:bg-slate-900 dark:border-gray-700 dark:text-gray-400 dark:focus:ring-gray-600"
-          placeholder="you@site.com"
         ></input>
       </div>
 
@@ -61,10 +89,11 @@ const SignupForm = () => {
           Email
         </label>
         <input
+          value={email}
+          onChange={(e) => setEmail(e.target.value)}
           type="email"
           id="input-label"
           class="py-3 px-4 block w-full border-gray-200 rounded-lg text-sm focus:border-blue-500 focus:ring-blue-500 disabled:opacity-50 disabled:pointer-events-none dark:bg-slate-900 dark:border-gray-700 dark:text-gray-400 dark:focus:ring-gray-600"
-          placeholder="you@site.com"
         ></input>
       </div>
 
@@ -73,11 +102,12 @@ const SignupForm = () => {
         <label class="block text-sm mb-2 dark:text-white">Password</label>
         <div class="relative">
           <input
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
             id="hs-toggle-password"
             type="password"
             class="py-3 px-4 block w-full border-gray-200 rounded-lg text-sm focus:border-blue-500 focus:ring-blue-500 disabled:opacity-50 disabled:pointer-events-none dark:bg-slate-900 dark:border-gray-700 dark:text-gray-400 dark:focus:ring-gray-600"
-            placeholder="Enter password"
-            value="12345qwerty"
+            placeholder=""
           />
           <button
             type="button"
@@ -131,7 +161,41 @@ const SignupForm = () => {
         </div>
       </div>
       {/* <!-- End Form Group --> */}
-      {isClicked ? <Button /> : <LoadingBtn />}
+
+      {/* <button
+        className=" bg-green-200"
+        type="button"
+        onClick={() => login(email, password)}
+      >
+        Login
+      </button> */}
+      {onSubmit ? (
+        <button
+          onClick={createUser}
+          type="button"
+          class="w-full  py-3 px-4 inline-flex justify-center items-center gap-x-2 text-sm font-medium rounded-lg border border-gray-200 bg-white text-gray-800 shadow-sm hover:bg-gray-50 disabled:opacity-50 disabled:pointer-events-none dark:bg-slate-900 dark:border-gray-700 dark:text-white dark:hover:bg-gray-800 dark:focus:outline-none dark:focus:ring-1 dark:focus:ring-gray-600"
+        >
+          Register
+        </button>
+      ) : (
+        <LoadingBtn />
+      )}
+
+      {/* <button className=" bg-red mx-10 rounded-lg" type="button">
+        Register
+      </button> */}
+
+      {/* <button
+        className=" bg-yellow-100"
+        type="button"
+        onClick={async () => {
+          await account.deleteSession("current");
+          setLoggedInUser(null);
+        }}
+      >
+        Logout
+      </button> */}
+      {/* {isClicked ? <Button /> : <LoadingBtn />} */}
       <p className=" text-gray-300 text-center">
         Already Have Account?
         <Link
@@ -144,6 +208,6 @@ const SignupForm = () => {
       </p>
     </div>
   );
-};
+}
 
 export default SignupForm;

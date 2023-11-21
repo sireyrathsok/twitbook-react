@@ -8,7 +8,7 @@ const AuthLayout = () => {
       {isAuthenticated ? (
         <Navigate to={"/"} />
       ) : (
-        <div className=" bg-black flex  justify-center items-center h-screen ">
+        <div className="flex bg-black  justify-center items-center h-screen ">
           <section className="  w-1/2 ">
             <Outlet />
           </section>
